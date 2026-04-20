@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+
+class BlackJack
+{
+    static Random random = new Random();
+
+    static int DrawCard()
+    {
+        int[] deck = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11 };
+        return deck[random.Next(deck.Length)];
+    }
+
+    static int CalculateTotal(List<int> hand)
+    {
+        int total = 0;
+        int aces = 0;
+
+        foreach (int card in hand)
+        {
+            total += card;
+            if (card == 11)
+                aces++;
+        }
+
+        while (total > 21 && aces > 0)
+        {
+            total -= 10;
+            aces--;
+        }
+
+        return total;
+    }
+
+    static void Main()
+    {
+        List<int> playerHand = new List<int>();
+        List<int> dealerHand = new List<int>();
+
+        playerHand.Add(DrawCard());
+        playerHand.Add(DrawCard());
+
+        dealerHand.Add(DrawCard());
+        dealerHand.Add(DrawCard());
+
+        bool playerTurn = true;
+
+        while (playerTurn)
+        {
+            Console.WriteLine("\nDine kort: " + string.Join(", ", playerHand));
+            Console.WriteLine("Sum: " + CalculateTotal(playerHand));
+
+            if (CalculateTotal(playerHand) > 21)
+            {
+                Console.WriteLine("Du bustet! Dealer vinner.");
+                return;
+            }
+
+            Console.Write("Vil du ha kort? (ja/nei): ");
+            string choice = Console.ReadLine();
+
+            if (choice.ToLower() == "ja")
+                playerHand.Add(DrawCard());
+            else
+                playerTurn = false;
+        }
+
+        while (CalculateTotal(dealerHand) < 17)
+        {
+            dealerHand.Add(DrawCard());
+        }
+
+        Console.WriteLine("\nDealer sine kort: " + string.Join(", ", dealerHand));
+        Console.WriteLine("Dealer sum: " + CalculateTotal(dealerHand));
+
+        int playerTotal = CalculateTotal(playerHand);
+        int dealerTotal = CalculateTotal(dealerHand);
+
+        if (dealerTotal > 21 || playerTotal > dealerTotal)
+            Console.WriteLine("Du vant!");
+        else if (playerTotal < dealerTotal)
+            Console.WriteLine("Dealer vant!");
+        else
+            Console.WriteLine("Uavgjort!");
+    }
+}
